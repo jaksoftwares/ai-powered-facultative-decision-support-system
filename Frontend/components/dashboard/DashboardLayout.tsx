@@ -33,6 +33,12 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+interface NavigationItem {
+  label: string;
+  href: string;
+  icon: string;
+}
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
@@ -41,7 +47,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   if (!user) return null;
 
-  const navigationItems = NAVIGATION_ITEMS[user.role] || [];
+  // Type-safe way to access navigation items
+  const navigationItems: readonly NavigationItem[] = NAVIGATION_ITEMS[user.role as keyof typeof NAVIGATION_ITEMS] || [];
 
   const handleLogout = () => {
     logout();
@@ -78,7 +85,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2">
-          {navigationItems.map((item) => {
+          {navigationItems.map((item: NavigationItem) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -119,7 +126,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </div>
 
       {/* Main content */}
-      <div className="lg: flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Top navigation */}
         <header className="bg-white shadow-sm border-b border-gray-200 h-16">
           <div className="flex items-center justify-between px-4 h-full">
