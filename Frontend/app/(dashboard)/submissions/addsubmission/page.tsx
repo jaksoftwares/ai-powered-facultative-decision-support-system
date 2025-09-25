@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
   ArrowLeft,
   Upload,
@@ -53,6 +52,18 @@ interface UploadedFile {
   status: 'uploading' | 'completed' | 'error';
   preview?: string;
 }
+
+// Simple Progress component replacement to avoid the compilation issue
+const SimpleProgress: React.FC<{ value: number; className?: string }> = ({ value, className = '' }) => {
+  return (
+    <div className={`w-full bg-gray-200 rounded-full h-2 ${className}`}>
+      <div 
+        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+      />
+    </div>
+  );
+};
 
 const AddSubmissionPage: React.FC = () => {
   const router = useRouter();
@@ -144,12 +155,14 @@ const AddSubmissionPage: React.FC = () => {
 
     // Simulate file upload progress
     newFiles.forEach(uploadFile => {
+      let currentProgress = 0;
       const interval = setInterval(() => {
+        currentProgress += Math.random() * 30;
+        const newProgress = Math.min(currentProgress, 100);
+        const isComplete = newProgress >= 100;
+        
         setUploadedFiles(prev => prev.map(f => {
           if (f.id === uploadFile.id) {
-            const newProgress = Math.min(f.progress + Math.random() * 30, 100);
-            const isComplete = newProgress >= 100;
-            
             return {
               ...f,
               progress: newProgress,
@@ -159,7 +172,7 @@ const AddSubmissionPage: React.FC = () => {
           return f;
         }));
 
-        if (uploadFile.progress >= 100) {
+        if (newProgress >= 100) {
           clearInterval(interval);
         }
       }, 300);
@@ -597,7 +610,7 @@ const AddSubmissionPage: React.FC = () => {
                           <p className="text-xs text-gray-600">{formatFileSize(file.size)}</p>
                           {file.status === 'uploading' && (
                             <div className="mt-1">
-                              <Progress value={file.progress} className="h-1 w-32" />
+                              <SimpleProgress value={file.progress} className="h-1 w-32" />
                             </div>
                           )}
                         </div>
