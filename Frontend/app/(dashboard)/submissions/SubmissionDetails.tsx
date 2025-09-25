@@ -195,28 +195,30 @@ const SubmissionDetailPage: React.FC = () => {
   };
 
   const handleDownloadAnalysis = (analysis: Analysis) => {
-    // Create and download analysis report
-    const reportData = {
-      submissionId: submission.id,
-      submissionTitle: submission.title,
-      analysisDate: analysis.date,
-      analyst: analysis.analyst,
-      riskRating: analysis.riskRating,
-      confidence: analysis.confidence,
-      keyFindings: analysis.keyFindings,
-      recommendations: analysis.recommendations,
-      summary: analysis.summary
-    };
+    // Create and download analysis report (client-side only)
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const reportData = {
+        submissionId: submission.id,
+        submissionTitle: submission.title,
+        analysisDate: analysis.date,
+        analyst: analysis.analyst,
+        riskRating: analysis.riskRating,
+        confidence: analysis.confidence,
+        keyFindings: analysis.keyFindings,
+        recommendations: analysis.recommendations,
+        summary: analysis.summary
+      };
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = globalThis.document.createElement('a');
-    a.href = url;
-    a.download = `analysis_report_${submission.id}_${Date.now()}.json`;
-    globalThis.document.body.appendChild(a);
-    a.click();
-    globalThis.document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analysis_report_${submission.id}_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
 
     toast({
       title: 'Download Started',
