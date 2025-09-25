@@ -524,12 +524,12 @@ export interface FilterOptions {
   cedant?: string[];
   assignedTo?: string[];
   dateRange?: {
-    from: Date;
-    to: Date;
+    from?: Date;
+    to?: Date;
   };
   amountRange?: {
-    min: number;
-    max: number;
+    min?: number;
+    max?: number;
   };
 }
 

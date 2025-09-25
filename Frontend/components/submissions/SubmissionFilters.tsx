@@ -110,7 +110,7 @@ const SubmissionFilters: React.FC<SubmissionFiltersProps> = ({
   };
 
   const handleDateRangeChange = (field: 'from' | 'to', date: Date | undefined) => {
-    const currentRange = filters.dateRange || {};
+  const currentRange = filters.dateRange || { from: undefined, to: undefined };
     const newRange = { ...currentRange, [field]: date };
     
     if (!newRange.from && !newRange.to) {
@@ -304,7 +304,7 @@ const SubmissionFilters: React.FC<SubmissionFiltersProps> = ({
                   value={filters.amountRange?.min || ''}
                   onChange={(e) => {
                     const value = e.target.value ? Number(e.target.value) : undefined;
-                    const currentRange = filters.amountRange || {};
+                    const currentRange = filters.amountRange || { min: undefined, max: undefined };
                     if (value === undefined && !currentRange.max) {
                       const { amountRange, ...otherFilters } = filters;
                       onFiltersChange(otherFilters);
@@ -323,7 +323,7 @@ const SubmissionFilters: React.FC<SubmissionFiltersProps> = ({
                   value={filters.amountRange?.max || ''}
                   onChange={(e) => {
                     const value = e.target.value ? Number(e.target.value) : undefined;
-                    const currentRange = filters.amountRange || {};
+                    const currentRange = filters.amountRange || { min: undefined, max: undefined };
                     if (value === undefined && !currentRange.min) {
                       const { amountRange, ...otherFilters } = filters;
                       onFiltersChange(otherFilters);
