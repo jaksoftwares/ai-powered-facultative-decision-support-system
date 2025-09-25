@@ -22,8 +22,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import DocumentViewer from './DocumentViewer';
-import AnalysisReport from './AnalysisReport';
 
 // Type definitions
 interface DocumentType {
@@ -62,6 +60,140 @@ interface Submission {
   documents: DocumentType[];
   analysisHistory: Analysis[];
 }
+
+// Simple Document Viewer Component
+const SimpleDocumentViewer: React.FC<{
+  document: DocumentType;
+  onAnalyze: () => void;
+  isAnalyzing: boolean;
+}> = ({ document, onAnalyze, isAnalyzing }) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Document Viewer - {document.name}</span>
+          <Button
+            onClick={onAnalyze}
+            disabled={isAnalyzing}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            {isAnalyzing ? 'Analyzing...' : 'Analyze Document'}
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+          <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Document Preview</h3>
+          <p className="text-gray-600 mb-4">{document.name}</p>
+          <p className="text-sm text-gray-500">Size: {document.size}</p>
+          <div className="mt-4">
+            <Button variant="outline" className="mr-2">
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+            <Button variant="outline">
+              <Eye className="h-4 w-4 mr-2" />
+              Open in New Tab
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Simple Analysis Report Component
+const SimpleAnalysisReport: React.FC<{
+  analysis: Analysis;
+  onDownload: () => void;
+}> = ({ analysis, onDownload }) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Analysis Report</span>
+          <Button onClick={onDownload}>
+            <Download className="h-4 w-4 mr-2" />
+            Download Report
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Summary */}
+        <div>
+          <h3 className="font-semibold mb-2">Summary</h3>
+          <p className="text-gray-700">{analysis.summary}</p>
+        </div>
+
+        {/* Risk Assessment */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-semibold mb-2">Risk Rating</h4>
+            <Badge className={
+              analysis.riskRating === 'Low' ? 'bg-green-100 text-green-800' :
+              analysis.riskRating === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }>
+              {analysis.riskRating}
+            </Badge>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-2">Confidence</h4>
+            <div className="flex items-center space-x-2">
+              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full" 
+                  style={{ width: `${analysis.confidence * 100}%` }}
+                />
+              </div>
+              <span className="text-sm font-medium">{Math.round(analysis.confidence * 100)}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Findings */}
+        <div>
+          <h3 className="font-semibold mb-2">Key Findings</h3>
+          <ul className="space-y-1">
+            {analysis.keyFindings.map((finding, index) => (
+              <li key={index} className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">{finding}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Recommendations */}
+        <div>
+          <h3 className="font-semibold mb-2">Recommendations</h3>
+          <ul className="space-y-1">
+            {analysis.recommendations.map((recommendation, index) => (
+              <li key={index} className="flex items-start space-x-2">
+                <AlertCircle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">{recommendation}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Metadata */}
+        <div className="border-t pt-4">
+          <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+            <div>
+              <span className="font-medium">Analyzed by:</span> {analysis.analyst}
+            </div>
+            <div>
+              <span className="font-medium">Date:</span> {new Date(analysis.date).toLocaleDateString()}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 // Mock data - replace with actual API call
 const mockSubmission: Submission = {
@@ -455,7 +587,7 @@ const SubmissionDetailPage: React.FC = () => {
           </Card>
 
           {showViewer && selectedDocument && (
-            <DocumentViewer
+            <SimpleDocumentViewer
               document={selectedDocument}
               onAnalyze={() => handleAnalyzeDocument(selectedDocument)}
               isAnalyzing={isAnalyzing}
@@ -465,7 +597,7 @@ const SubmissionDetailPage: React.FC = () => {
 
         <TabsContent value="analysis" className="space-y-4">
           {analysisResult ? (
-            <AnalysisReport
+            <SimpleAnalysisReport
               analysis={analysisResult}
               onDownload={() => handleDownloadAnalysis(analysisResult)}
             />
