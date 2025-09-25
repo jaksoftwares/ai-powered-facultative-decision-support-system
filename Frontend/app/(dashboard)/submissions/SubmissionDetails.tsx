@@ -25,8 +25,46 @@ import { toast } from '@/hooks/use-toast';
 import DocumentViewer from './DocumentViewer';
 import AnalysisReport from './AnalysisReport';
 
+// Type definitions
+interface DocumentType {
+  id: string;
+  name: string;
+  size: string;
+  type: string;
+  url: string;
+}
+
+interface Analysis {
+  id: string;
+  documentId: string;
+  documentName: string;
+  date: string;
+  analyst: string;
+  status: string;
+  riskRating: string;
+  confidence: number;
+  keyFindings: string[];
+  recommendations: string[];
+  summary: string;
+  downloadUrl: string;
+}
+
+interface Submission {
+  id: string;
+  title: string;
+  status: string;
+  submittedBy: string;
+  submittedDate: string;
+  company: string;
+  policyType: string;
+  sumInsured: number;
+  description: string;
+  documents: DocumentType[];
+  analysisHistory: Analysis[];
+}
+
 // Mock data - replace with actual API call
-const mockSubmission = {
+const mockSubmission: Submission = {
   id: '1',
   title: 'Commercial Property Insurance - ABC Corp',
   status: 'pending_review',
@@ -47,6 +85,12 @@ const mockSubmission = {
       date: '2024-01-16',
       analyst: 'AI System',
       status: 'completed',
+      documentId: 'doc1',
+      documentName: 'Policy Application.pdf',
+      riskRating: 'Medium',
+      confidence: 0.85,
+      keyFindings: ['Initial assessment completed'],
+      recommendations: ['Regular review recommended'],
       summary: 'Initial risk assessment completed with moderate risk rating',
       downloadUrl: '/api/analysis/analysis1/download'
     }
@@ -56,11 +100,11 @@ const mockSubmission = {
 const SubmissionDetailPage: React.FC = () => {
   const router = useRouter();
   const params = useParams();
-  const [submission, setSubmission] = useState(mockSubmission);
+  const [submission, setSubmission] = useState<Submission>(mockSubmission);
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null);
+  const [analysisResult, setAnalysisResult] = useState<Analysis | null>(null);
   const [showViewer, setShowViewer] = useState(false);
 
   useEffect(() => {
@@ -90,22 +134,23 @@ const SubmissionDetailPage: React.FC = () => {
     }
   };
 
-  const handleDocumentView = (document) => {
+  const handleDocumentView = (document: DocumentType) => {
     setSelectedDocument(document);
     setShowViewer(true);
   };
 
-  const handleAnalyzeDocument = async (document) => {
+  const handleAnalyzeDocument = async (document: DocumentType) => {
     setIsAnalyzing(true);
     try {
       // Simulate API call for document analysis
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      const mockAnalysis = {
+      const mockAnalysis: Analysis = {
         id: `analysis_${Date.now()}`,
         documentId: document.id,
         documentName: document.name,
         date: new Date().toISOString(),
+        analyst: 'AI System',
         status: 'completed',
         riskRating: 'Medium',
         confidence: 0.87,
@@ -149,13 +194,13 @@ const SubmissionDetailPage: React.FC = () => {
     }
   };
 
-  const handleDownloadAnalysis = (analysis) => {
+  const handleDownloadAnalysis = (analysis: Analysis) => {
     // Create and download analysis report
     const reportData = {
       submissionId: submission.id,
       submissionTitle: submission.title,
       analysisDate: analysis.date,
-      analyst: analysis.analyst || 'AI System',
+      analyst: analysis.analyst,
       riskRating: analysis.riskRating,
       confidence: analysis.confidence,
       keyFindings: analysis.keyFindings,
@@ -165,12 +210,12 @@ const SubmissionDetailPage: React.FC = () => {
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = globalThis.document.createElement('a');
     a.href = url;
     a.download = `analysis_report_${submission.id}_${Date.now()}.json`;
-    document.body.appendChild(a);
+    globalThis.document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    globalThis.document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     toast({
