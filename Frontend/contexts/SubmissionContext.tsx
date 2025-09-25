@@ -320,8 +320,8 @@ export const SubmissionProvider: React.FC<{ children: ReactNode }> = ({ children
       // Mock AI analysis
       const existing = state.submissions.find(sub => sub.id === id);
       if (existing) {
-        const updated = { 
-          ...existing, 
+        const updated = {
+          ...existing,
           status: 'pricing_review' as SubmissionStatus,
           aiAnalysis: {
             id: 'ai1',
@@ -338,12 +338,12 @@ export const SubmissionProvider: React.FC<{ children: ReactNode }> = ({ children
               riskScore: 0.75,
               riskFactors: [],
               pmlEstimate: 25000000,
-              confidenceInterval: [20000000, 30000000],
+              confidenceInterval: [20000000, 30000000] as [number, number],
               methodology: 'Monte Carlo simulation',
             },
             pricingRecommendation: {
               recommendedRate: 0.01,
-              rateRange: [0.008, 0.012],
+              rateRange: [0.008, 0.012] as [number, number],
               rationale: 'Based on similar risks and loss history',
               keyFactors: ['Construction type', 'Protection measures', 'Location'],
               benchmarkComparison: [],
@@ -425,9 +425,11 @@ export const SubmissionProvider: React.FC<{ children: ReactNode }> = ({ children
 
     if (state.filters.dateRange) {
       const { from, to } = state.filters.dateRange;
-      filtered = filtered.filter(sub => 
-        sub.submissionDate >= from && sub.submissionDate <= to
-      );
+      if (from && to) {
+        filtered = filtered.filter(sub => 
+          sub.submissionDate >= from && sub.submissionDate <= to
+        );
+      }
     }
 
     // Apply sorting
