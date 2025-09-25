@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NAVIGATION_ITEMS, USER_ROLES } from '@/lib/constants';
 import Logo from '@/components/ui/logo';
+import * as Icons from 'lucide-react'; // ✅ import all Lucide icons
 import {
   Bell,
   ChevronDown,
@@ -48,14 +49,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   if (!user) return null;
 
   // Type-safe way to access navigation items
-  const navigationItems: readonly NavigationItem[] = NAVIGATION_ITEMS[user.role as keyof typeof NAVIGATION_ITEMS] || [];
+  const navigationItems: readonly NavigationItem[] =
+    NAVIGATION_ITEMS[user.role as keyof typeof NAVIGATION_ITEMS] || [];
 
   const handleLogout = () => {
     logout();
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="h-screen flex bg-gray-50 overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -63,16 +65,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
 
-      {/* Sidebar */}
+      {/* Sidebar - Fixed */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform lg:translate-x-0 lg:static lg:inset-0',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform lg:translate-x-0 lg:static lg:inset-0 flex flex-col',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+        {/* Sidebar Header - Fixed */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 flex-shrink-0">
           <Logo size="md" variant="text" />
           <Button
             variant="ghost"
@@ -84,9 +86,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </Button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        {/* Sidebar Navigation - Scrollable */}
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {navigationItems.map((item: NavigationItem) => {
             const isActive = pathname === item.href;
+            const Icon =
+              (Icons as any)[item.icon] || Icons.Circle; // ✅ fallback if icon not found
             return (
               <Link
                 key={item.href}
@@ -99,14 +104,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 )}
                 onClick={() => setSidebarOpen(false)}
               >
-                <span className="text-lg">📊</span>
+                <Icon className="h-5 w-5" /> {/* ✅ dynamic icon */}
                 <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-gray-200 p-4">
+        {/* Sidebar Footer - Fixed */}
+        <div className="border-t border-gray-200 p-4 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
               <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -118,17 +124,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 {user.name}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                {user.role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                {user.role
+                  .replace('_', ' ')
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top navigation */}
-        <header className="bg-white shadow-sm border-b border-gray-200 h-16">
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col lg:ml-0">
+        {/* Top navigation - Fixed */}
+        <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex-shrink-0 fixed top-0 right-0 left-0 lg:left-64 z-30">
           <div className="flex items-center justify-between px-4 h-full">
             <div className="flex items-center space-x-4">
               <Button
@@ -176,22 +184,32 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <div className="max-h-96 overflow-y-auto">
                     <DropdownMenuItem className="p-3">
                       <div className="space-y-1">
-                        <p className="font-medium text-sm">High Priority Submission</p>
-                        <p className="text-xs text-gray-500">FAC-2024-001 requires immediate review</p>
+                        <p className="font-medium text-sm">
+                          High Priority Submission
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          FAC-2024-001 requires immediate review
+                        </p>
                         <p className="text-xs text-gray-400">2 minutes ago</p>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="p-3">
                       <div className="space-y-1">
-                        <p className="font-medium text-sm">Portfolio Limit Alert</p>
-                        <p className="text-xs text-gray-500">Property class approaching 85% of limit</p>
+                        <p className="font-medium text-sm">
+                          Portfolio Limit Alert
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Property class approaching 85% of limit
+                        </p>
                         <p className="text-xs text-gray-400">1 hour ago</p>
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="p-3">
                       <div className="space-y-1">
                         <p className="font-medium text-sm">Market Update</p>
-                        <p className="text-xs text-gray-500">New catastrophe model update available</p>
+                        <p className="text-xs text-gray-500">
+                          New catastrophe model update available
+                        </p>
                         <p className="text-xs text-gray-400">3 hours ago</p>
                       </div>
                     </DropdownMenuItem>
@@ -207,7 +225,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               {/* User menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2"
+                  >
                     <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
                       <User className="h-4 w-4 text-red-600" />
                     </div>
@@ -238,8 +259,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-6">
+        {/* Page content - Scrollable */}
+        <main className="flex-1 p-6 pt-22 overflow-y-auto mt-16">
           {children}
         </main>
       </div>

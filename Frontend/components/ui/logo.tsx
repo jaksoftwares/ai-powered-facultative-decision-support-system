@@ -6,18 +6,20 @@ interface LogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   variant?: 'full' | 'icon' | 'text';
+  useInitials?: boolean; // new toggle
 }
 
 const Logo: React.FC<LogoProps> = ({ 
   className, 
   size = 'md', 
-  variant = 'full' 
+  variant = 'full',
+  useInitials = false // default: show image
 }) => {
   const sizeClasses = {
-    sm: 'h-6',
-    md: 'h-8', 
-    lg: 'h-12',
-    xl: 'h-16'
+    sm: 'h-6 w-6',
+    md: 'h-8 w-8', 
+    lg: 'h-12 w-12',
+    xl: 'h-16 w-16'
   };
 
   const textSizeClasses = {
@@ -29,21 +31,36 @@ const Logo: React.FC<LogoProps> = ({
 
   if (variant === 'icon') {
     return (
-      <div className={cn(
-        'flex items-center justify-center bg-gradient-to-br from-red-600 to-red-700 rounded-lg',
-        sizeClasses[size],
-        `w-${sizeClasses[size].replace('h-', '')}`,
-        className
-      )}>
-        <span className={cn(
-          'font-bold text-white',
-          size === 'sm' && 'text-xs',
-          size === 'md' && 'text-sm', 
-          size === 'lg' && 'text-lg',
-          size === 'xl' && 'text-2xl'
-        )}>
-          KR
-        </span>
+      <div className={cn('flex items-center justify-center', className)}>
+        {useInitials ? (
+          <div
+            className={cn(
+              'flex items-center justify-center bg-gradient-to-br from-red-600 to-red-700 rounded-lg',
+              sizeClasses[size]
+            )}
+          >
+            <span
+              className={cn(
+                'font-bold text-white',
+                size === 'sm' && 'text-xs',
+                size === 'md' && 'text-sm', 
+                size === 'lg' && 'text-lg',
+                size === 'xl' && 'text-2xl'
+              )}
+            >
+              KR
+            </span>
+          </div>
+        ) : (
+          <Image
+            src="/logo.png"
+            alt="Kenya RE"
+            width={size === 'sm' ? 24 : size === 'md' ? 32 : size === 'lg' ? 40 : 56}
+            height={size === 'sm' ? 24 : size === 'md' ? 32 : size === 'lg' ? 40 : 56}
+            className="object-contain"
+            priority
+          />
+        )}
       </div>
     );
   }
@@ -51,37 +68,53 @@ const Logo: React.FC<LogoProps> = ({
   if (variant === 'text') {
     return (
       <div className={cn('flex items-center space-x-2', className)}>
-        <div className={cn(
-          'flex items-center justify-center bg-gradient-to-br from-red-600 to-red-700 rounded-lg',
-          size === 'sm' && 'h-6 w-6',
-          size === 'md' && 'h-8 w-8',
-          size === 'lg' && 'h-10 w-10',
-          size === 'xl' && 'h-12 w-12'
-        )}>
-          <span className={cn(
-            'font-bold text-white',
-            size === 'sm' && 'text-xs',
-            size === 'md' && 'text-sm',
-            size === 'lg' && 'text-base',
-            size === 'xl' && 'text-lg'
-          )}>
-            KR
-          </span>
-        </div>
+        {useInitials ? (
+          <div
+            className={cn(
+              'flex items-center justify-center bg-gradient-to-br from-red-600 to-red-700 rounded-lg',
+              sizeClasses[size]
+            )}
+          >
+            <span
+              className={cn(
+                'font-bold text-white',
+                size === 'sm' && 'text-xs',
+                size === 'md' && 'text-sm',
+                size === 'lg' && 'text-base',
+                size === 'xl' && 'text-lg'
+              )}
+            >
+              KR
+            </span>
+          </div>
+        ) : (
+          <Image
+            src="/logo.png"
+            alt="Kenya RE"
+            width={size === 'sm' ? 48 : size === 'md' ? 64 : size === 'lg' ? 80 : 100}
+            height={size === 'sm' ? 48 : size === 'md' ? 64 : size === 'lg' ? 80 : 100}
+            className="object-contain"
+            priority
+          />
+        )}
         <div className="flex flex-col">
-          <span className={cn(
-            'font-bold text-gray-900 leading-none',
-            textSizeClasses[size]
-          )}>
+          <span
+            className={cn(
+              'font-bold text-gray-900 leading-none',
+              textSizeClasses[size]
+            )}
+          >
             KENYA RE
           </span>
-          <span className={cn(
-            'text-gray-600 text-xs leading-none mt-0.5',
-            size === 'sm' && 'text-[10px]',
-            size === 'md' && 'text-xs',
-            size === 'lg' && 'text-sm',
-            size === 'xl' && 'text-base'
-          )}>
+          <span
+            className={cn(
+              'text-gray-600 text-xs leading-none mt-0.5',
+              size === 'sm' && 'text-[10px]',
+              size === 'md' && 'text-xs',
+              size === 'lg' && 'text-sm',
+              size === 'xl' && 'text-base'
+            )}
+          >
             FACULTATIVE DECISION SUPPORT
           </span>
         </div>
@@ -91,7 +124,16 @@ const Logo: React.FC<LogoProps> = ({
 
   return (
     <div className={cn('flex items-center space-x-3', className)}>
-      <div className="relative">
+      {useInitials ? (
+        <div
+          className={cn(
+            'flex items-center justify-center bg-gradient-to-br from-red-600 to-red-700 rounded-lg',
+            sizeClasses[size]
+          )}
+        >
+          <span className="font-bold text-white">KR</span>
+        </div>
+      ) : (
         <Image
           src="/logo.png"
           alt="Kenya RE"
@@ -100,21 +142,25 @@ const Logo: React.FC<LogoProps> = ({
           className="object-contain"
           priority
         />
-      </div>
+      )}
       <div className="flex flex-col">
-        <span className={cn(
-          'font-bold text-gray-900 leading-none',
-          textSizeClasses[size]
-        )}>
+        <span
+          className={cn(
+            'font-bold text-gray-900 leading-none',
+            textSizeClasses[size]
+          )}
+        >
           KRFDS
         </span>
-        <span className={cn(
-          'text-gray-600 leading-none mt-0.5',
-          size === 'sm' && 'text-[10px]',
-          size === 'md' && 'text-xs', 
-          size === 'lg' && 'text-sm',
-          size === 'xl' && 'text-base'
-        )}>
+        <span
+          className={cn(
+            'text-gray-600 leading-none mt-0.5',
+            size === 'sm' && 'text-[10px]',
+            size === 'md' && 'text-xs', 
+            size === 'lg' && 'text-sm',
+            size === 'xl' && 'text-base'
+          )}
+        >
           Facultative Decision Support
         </span>
       </div>
